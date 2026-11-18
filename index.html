@@ -1,244 +1,877 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>補習班行政管理系統</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#263449}
-header{background:#244b78;color:white;padding:22px}
-header h1{margin:0;font-size:22px}
-header p{font-size:13px;color:#dce8f5}
-nav{display:flex;gap:8px;padding:10px;background:white;position:sticky;top:0;overflow:auto}
-nav button,.btn{border:0;padding:11px 15px;border-radius:7px;background:#e8eef6;color:#244b78;white-space:nowrap}
-nav button.active,.btn{background:#244b78;color:white}
-main{max-width:1000px;margin:20px auto;padding:0 12px}
-.panel,.stat{background:white;padding:17px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 10px #00000008}
-h2{font-size:19px}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
-input,select{padding:11px;border:1px solid #d5deea;border-radius:7px;font-size:14px;min-width:0}
-.controls input{flex:1;min-width:150px}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:flex;flex-direction:column;gap:6px;font-size:13px}
-.form-actions{display:flex;gap:8px;margin:15px 0}
-.tablewrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
-th,td{padding:12px 9px;text-align:left;border-bottom:1px solid #eee}
-th{background:#f4f7fb}
-.actions{display:flex;gap:5px}
-.actions button{border:0;padding:7px;border-radius:5px}
-.danger{background:#c94b4b;color:white}
-.secondary{background:#e8eef6;color:#244b78}
-.hidden{display:none}
-.empty{text-align:center;color:#888;padding:22px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat span{font-size:13px;color:#778}
-.stat strong{display:block;font-size:25px;color:#244b78;margin-top:7px}
-.tag{background:#e8f2ff;color:#245b91;padding:5px 9px;border-radius:15px}
-footer{text-align:center;color:#888;padding:20px;font-size:12px}
-@media(max-width:500px){.formgrid{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<header>
-<h1>補習班行政管理系統</h1>
-<p>Tutoring Center Management System</p>
-</header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>補習班行政管理系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f3f6fb;
+        color: #263449;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      header {
+        background: #244b78;
+        color: white;
+        padding: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header .header-left h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+      header .header-left p {
+        font-size: 13px;
+        color: #dce8f5;
+        margin: 5px 0 0 0;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 13px;
+      }
+      .header-actions span {
+        color: #dce8f5;
+      }
+      .header-actions button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .header-actions button:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .auth-locked {
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+      }
+      nav {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        background: white;
+        position: sticky;
+        top: 0;
+        overflow: auto;
+      }
+      nav button,
+      .btn {
+        border: 0;
+        padding: 11px 15px;
+        border-radius: 7px;
+        background: #e8eef6;
+        color: #244b78;
+        white-space: nowrap;
+      }
+      nav button.active,
+      .btn {
+        background: #244b78;
+        color: white;
+      }
+      main {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 12px;
+        flex: 1;
+        width: 100%;
+        min-height: 400px;
+      }
+      .panel,
+      .stat {
+        background: white;
+        padding: 17px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px #00000008;
+      }
+      h2 {
+        font-size: 19px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+      }
+      input,
+      select {
+        padding: 11px;
+        border: 1px solid #d5deea;
+        border-radius: 7px;
+        font-size: 14px;
+        min-width: 0;
+      }
+      .controls input {
+        flex: 1;
+        min-width: 150px;
+      }
+      .formgrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 13px;
+      }
+      .form-actions {
+        display: flex;
+        gap: 8px;
+        margin: 15px 0;
+      }
+      .form-actions button {
+        padding: 11px 20px;
+        border: 0;
+        border-radius: 7px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .tablewrap {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      th,
+      td {
+        padding: 12px 9px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      th {
+        background: #f4f7fb;
+      }
+      .actions {
+        display: flex;
+        gap: 5px;
+      }
+      .actions button {
+        border: 0;
+        padding: 7px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        background: #244b78;
+        color: white;
+      }
+      .actions button:hover {
+        background: #1a3a5c;
+      }
+      .danger {
+        background: #c94b4b !important;
+        color: white;
+      }
+      .danger:hover {
+        background: #a83d3d !important;
+      }
+      .secondary {
+        background: #e8eef6;
+        color: #244b78;
+        cursor: pointer;
+      }
+      .secondary:hover {
+        background: #d5deea;
+      }
+      .hidden {
+        display: none;
+      }
+      .empty {
+        text-align: center;
+        color: #888;
+        padding: 22px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .stat span {
+        font-size: 13px;
+        color: #778;
+      }
+      .stat strong {
+        display: block;
+        font-size: 25px;
+        color: #244b78;
+        margin-top: 7px;
+      }
+      .tag {
+        background: #e8f2ff;
+        color: #245b91;
+        padding: 5px 9px;
+        border-radius: 15px;
+      }
+      footer {
+        text-align: center;
+        color: #888;
+        padding: 20px;
+        font-size: 12px;
+      }
+      @media (max-width: 500px) {
+        .formgrid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-left">
+        <h1>補習班行政管理系統</h1>
+        <p>Tutoring Center Management System</p>
+      </div>
+      <div class="header-actions">
+        <span id="authStatus">未登入</span>
+        <button id="authBtn" onclick="toggleAuth()">登入</button>
+      </div>
+    </header>
 
-<nav>
-<button class="active" onclick="page('teachers',this)">教師資料管理</button>
-<button onclick="page('students',this)">學生資料管理</button>
-<button onclick="page('attendance',this)">出缺勤管理</button>
-</nav>
+    <nav>
+      <button class="active" onclick="page('teachers', this)">
+        教師資料管理
+      </button>
+      <button onclick="page('teacherAttendance', this)">教師到班管理</button>
+      <button onclick="page('students', this)">學生資料管理</button>
+      <button onclick="page('attendance', this)">出缺勤管理</button>
+    </nav>
 
-<main>
-<section id="teachers">
-<div class="panel">
-<h2>教師資料管理</h2>
-<div class="controls">
-<input id="tSearch" placeholder="搜尋教師姓名或科目" oninput="renderT()">
-<button class="btn" onclick="formT()">＋ 新增教師</button>
-</div>
-<div id="tForm" class="hidden">
-<div class="formgrid">
-<label>教師姓名<input id="tName"></label>
-<label>聯絡電話<input id="tPhone"></label>
-<label>教授科目<input id="tSubject"></label>
-<label>到職日期<input id="tDate" type="date"></label>
-</div>
-<div class="form-actions">
-<button class="btn" onclick="saveT()">儲存</button>
-<button class="secondary" onclick="hide('tForm')">取消</button>
-</div>
-</div>
-<div class="tablewrap">
-<table><thead><tr><th>編號</th><th>姓名</th><th>電話</th><th>科目</th><th>到職日</th><th>操作</th></tr></thead>
-<tbody id="tRows"></tbody></table>
-</div>
-</div>
-</section>
+    <main>
+      <section id="teachers">
+        <div class="panel">
+          <h2>教師資料管理</h2>
+          <div class="controls">
+            <input
+              id="tSearch"
+              placeholder="搜尋教師姓名或科目"
+              oninput="renderT()"
+            />
+            <button class="btn" onclick="formT()">＋ 新增教師</button>
+          </div>
+          <div id="tForm" class="hidden">
+            <div class="formgrid">
+              <label>教師姓名<input id="tName" /></label>
+              <label>聯絡電話<input id="tPhone" /></label>
+              <label>教授科目<input id="tSubject" /></label>
+              <label>到職日期<input id="tDate" type="date" /></label>
+            </div>
+            <div class="form-actions">
+              <button class="btn" onclick="saveT()">儲存</button>
+              <button class="secondary" onclick="hide('tForm')">取消</button>
+            </div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>編號</th>
+                  <th>姓名</th>
+                  <th>電話</th>
+                  <th>科目</th>
+                  <th>到職日</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-<section id="students" class="hidden">
-<div class="panel">
-<h2>學生資料管理</h2>
-<div class="controls">
-<input id="sSearch" placeholder="搜尋學生姓名或班級" oninput="renderS()">
-<button class="btn" onclick="formS()">＋ 新增學生</button>
-</div>
-<div id="sForm" class="hidden">
-<div class="formgrid">
-<label>學生姓名<input id="sName"></label>
-<label>年級<input id="sGrade" placeholder="國小六年級"></label>
-<label>家長姓名<input id="sParent"></label>
-<label>聯絡電話<input id="sPhone"></label>
-<label>就讀班級<input id="sClass"></label>
-</div>
-<div class="form-actions">
-<button class="btn" onclick="saveS()">儲存</button>
-<button class="secondary" onclick="hide('sForm')">取消</button>
-</div>
-</div>
-<div class="tablewrap">
-<table><thead><tr><th>學號</th><th>姓名</th><th>年級</th><th>家長</th><th>電話</th><th>班級</th><th>操作</th></tr></thead>
-<tbody id="sRows"></tbody></table>
-</div>
-</div>
-</section>
+      <section id="teacherAttendance" class="hidden">
+        <div class="panel">
+          <h2>教師到班管理</h2>
+          <div class="controls">
+            <input type="date" id="taFilterDate" />
+            <button class="btn" onclick="formTA()">＋ 登記教師到班</button>
+          </div>
+          <div id="taForm" class="hidden">
+            <div class="formgrid">
+              <label>教師<select id="taTeacher"></select></label>
+              <label>日期<input id="taDate" type="date" /></label>
+              <label>上班時間<input id="taStart" type="time" /></label>
+              <label>下班時間<input id="taEnd" type="time" /></label>
+              <label
+                >狀態<select id="taStatus">
+                  <option>正常</option>
+                  <option>遲到</option>
+                  <option>早退</option>
+                  <option>請假</option>
+                  <option>缺勤</option>
+                </select></label
+              >
+              <label>備註<input id="taNote" /></label>
+            </div>
+            <div class="form-actions">
+              <button class="btn" onclick="saveTA()">儲存</button>
+              <button class="secondary" onclick="hide('taForm')">取消</button>
+            </div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>教師</th>
+                  <th>上班時間</th>
+                  <th>下班時間</th>
+                  <th>狀態</th>
+                  <th>備註</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="taRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-<section id="attendance" class="hidden">
-<div class="stats">
-<div class="stat"><span>總紀錄</span><strong id="total">0</strong></div>
-<div class="stat"><span>出席</span><strong id="present">0</strong></div>
-<div class="stat"><span>遲到</span><strong id="late">0</strong></div>
-<div class="stat"><span>請假／缺席</span><strong id="absent">0</strong></div>
-</div>
-<div class="panel">
-<h2>出缺勤管理</h2>
-<div class="controls">
-<input type="date" id="filterDate">
-<button class="btn" onclick="formA()">＋ 登記出缺勤</button>
-</div>
-<div id="aForm" class="hidden">
-<div class="formgrid">
-<label>學生<select id="aStudent"></select></label>
-<label>日期<input id="aDate" type="date"></label>
-<label>出缺勤狀態<select id="aStatus"><option>出席</option><option>遲到</option><option>請假</option><option>缺席</option></select></label>
-<label>備註<input id="aNote"></label>
-</div>
-<div class="form-actions">
-<button class="btn" onclick="saveA()">儲存</button>
-<button class="secondary" onclick="hide('aForm')">取消</button>
-</div>
-</div>
-<div class="tablewrap">
-<table><thead><tr><th>日期</th><th>學生</th><th>狀態</th><th>備註</th><th>操作</th></tr></thead>
-<tbody id="aRows"></tbody></table>
-</div>
-</div>
-</section>
-</main>
-<footer>補習班行政管理系統｜期中作業</footer>
+      <section id="students" class="hidden">
+        <div class="panel">
+          <h2>學生資料管理</h2>
+          <div class="controls">
+            <input
+              id="sSearch"
+              placeholder="搜尋學生姓名或班級"
+              oninput="renderS()"
+            />
+            <button class="btn" onclick="formS()">＋ 新增學生</button>
+          </div>
+          <div id="sForm" class="hidden">
+            <div class="formgrid">
+              <label>學生姓名<input id="sName" /></label>
+              <label>年級<input id="sGrade" placeholder="國小六年級" /></label>
+              <label>家長姓名<input id="sParent" /></label>
+              <label>聯絡電話<input id="sPhone" /></label>
+              <label>就讀班級<input id="sClass" /></label>
+            </div>
+            <div class="form-actions">
+              <button class="btn" onclick="saveS()">儲存</button>
+              <button class="secondary" onclick="hide('sForm')">取消</button>
+            </div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>學號</th>
+                  <th>姓名</th>
+                  <th>年級</th>
+                  <th>家長</th>
+                  <th>電話</th>
+                  <th>班級</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="sRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-<script>
-const load=k=>JSON.parse(localStorage.getItem(k)||'[]');
-const store=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-let ts=load('teachers'),ss=load('students'),as=load('attendance');
-let et=null,es=null,ea=null;
-const $=id=>document.getElementById(id);
-const val=id=>$(id).value.trim();
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      <section id="attendance" class="hidden">
+        <div class="stats">
+          <div class="stat">
+            <span>總紀錄</span><strong id="total">0</strong>
+          </div>
+          <div class="stat">
+            <span>出席</span><strong id="present">0</strong>
+          </div>
+          <div class="stat"><span>遲到</span><strong id="late">0</strong></div>
+          <div class="stat">
+            <span>請假／缺席</span><strong id="absent">0</strong>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>出缺勤管理</h2>
+          <div class="controls">
+            <input type="date" id="filterDate" />
+            <select id="aFilterStatus">
+              <option value="">全部狀態</option>
+              <option>出席</option>
+              <option>遲到</option>
+              <option>請假</option>
+              <option>缺席</option>
+            </select>
+            <select id="aFilterStu"></select>
+            <button class="btn" onclick="formA()">＋ 登記出缺勤</button>
+          </div>
+          <div id="aForm" class="hidden">
+            <div class="formgrid">
+              <label>學生<select id="aStudent"></select></label>
+              <label>日期<input id="aDate" type="date" /></label>
+              <label
+                >出缺勤狀態<select id="aStatus">
+                  <option>出席</option>
+                  <option>遲到</option>
+                  <option>請假</option>
+                  <option>缺席</option>
+                </select></label
+              >
+              <label>備註<input id="aNote" /></label>
+            </div>
+            <div class="form-actions">
+              <button class="btn" onclick="saveA()">儲存</button>
+              <button class="secondary" onclick="hide('aForm')">取消</button>
+            </div>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>學生</th>
+                  <th>狀態</th>
+                  <th>備註</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="aRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>補習班行政管理系統｜期中作業</footer>
 
-function page(id,b){
-document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));
-$(id).classList.remove('hidden');
-document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-b.classList.add('active');renderAll();
-}
-function hide(id){$(id).classList.add('hidden')}
-function clear(ids){ids.forEach(id=>$(id).value='')}
+    <script>
+      const SUPABASE_URL = "https://sefulckyyzhcbaipqtdc.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_vea_zEbwoXJI4j3LDa-7Kg_xFRsdaw5";
+      const { createClient } = window.supabase;
+      const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function formT(){et=null;clear(['tName','tPhone','tSubject','tDate']);$('tForm').classList.remove('hidden')}
-function saveT(){
-if(!val('tName'))return alert('請輸入教師姓名');
-let x={id:et||Date.now(),name:val('tName'),phone:val('tPhone'),subject:val('tSubject'),date:$('tDate').value};
-ts=et?ts.map(y=>y.id===et?x:y):[...ts,x];
-store('teachers',ts);hide('tForm');renderT();
-}
-function renderT(){
-let q=val('tSearch').toLowerCase();
-$('tRows').innerHTML=ts.filter(x=>(x.name+x.subject).toLowerCase().includes(q)).map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.subject)}</td><td>${esc(x.date)}</td><td><div class="actions"><button onclick="editT(${x.id})">修改</button><button class="danger" onclick="delT(${x.id})">刪除</button></div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">尚無教師資料</td></tr>';
-}
-function editT(id){
-let x=ts.find(y=>y.id===id);et=id;
-$('tName').value=x.name;$('tPhone').value=x.phone;$('tSubject').value=x.subject;$('tDate').value=x.date;
-$('tForm').classList.remove('hidden');
-}
-function delT(id){
-if(confirm('確定刪除教師資料？')){ts=ts.filter(x=>x.id!==id);store('teachers',ts);renderT()}
-}
+      let ts = [], ss = [], as = [], tas = [];
+      let et = null, es = null, ea = null, eta = null;
+      let isLoggedIn = false;
+      let currentUser = null;
+      const $ = (id) => document.getElementById(id);
+      const val = (id) => $(id).value.trim();
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
 
-function formS(){es=null;clear(['sName','sGrade','sParent','sPhone','sClass']);$('sForm').classList.remove('hidden')}
-function saveS(){
-if(!val('sName'))return alert('請輸入學生姓名');
-let x={id:es||Date.now(),name:val('sName'),grade:val('sGrade'),parent:val('sParent'),phone:val('sPhone'),cls:val('sClass')};
-ss=es?ss.map(y=>y.id===es?x:y):[...ss,x];
-store('students',ss);hide('sForm');renderS();renderA();
-}
-function renderS(){
-let q=val('sSearch').toLowerCase();
-$('sRows').innerHTML=ss.filter(x=>(x.name+x.cls+x.grade).toLowerCase().includes(q)).map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${esc(x.grade)}</td><td>${esc(x.parent)}</td><td>${esc(x.phone)}</td><td>${esc(x.cls)}</td><td><div class="actions"><button onclick="editS(${x.id})">修改</button><button class="danger" onclick="delS(${x.id})">刪除</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="empty">尚無學生資料</td></tr>';
-}
-function editS(id){
-let x=ss.find(y=>y.id===id);es=id;
-$('sName').value=x.name;$('sGrade').value=x.grade;$('sParent').value=x.parent;$('sPhone').value=x.phone;$('sClass').value=x.cls;
-$('sForm').classList.remove('hidden');
-}
-function delS(id){
-if(confirm('確定刪除學生資料？')){
-ss=ss.filter(x=>x.id!==id);store('students',ss);renderS();renderA();
-}
-}
+      function page(id, b) {
+        document
+          .querySelectorAll("main section")
+          .forEach((x) => x.classList.add("hidden"));
+        $(id).classList.remove("hidden");
+        document
+          .querySelectorAll("nav button")
+          .forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+        renderAll();
+      }
+      function hide(id) {
+        $(id).classList.add("hidden");
+      }
+      function clear(ids) {
+        ids.forEach((id) => ($(id).value = ""));
+      }
 
-function formA(){
-if(!ss.length)return alert('請先新增學生資料');
-ea=null;
-$('aStudent').innerHTML=ss.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
-$('aDate').value=new Date().toLocaleDateString('en-CA');
-$('aStatus').value='出席';$('aNote').value='';
-$('aForm').classList.remove('hidden');
-}
-function saveA(){
-let sid=Number($('aStudent').value);
-if(!sid)return alert('請選擇學生');
-let x={id:ea||Date.now(),sid,date:$('aDate').value,status:$('aStatus').value,note:val('aNote')};
-as=ea?as.map(y=>y.id===ea?x:y):[...as,x];
-store('attendance',as);hide('aForm');renderA();
-}
-function renderA(){
-let d=$('filterDate').value;
-let list=as.filter(x=>!d||x.date===d);
-$('aRows').innerHTML=list.map(x=>{
-let s=ss.find(y=>y.id===x.sid);
-return `<tr><td>${esc(x.date)}</td><td>${esc(s?s.name:'已刪除學生')}</td><td><span class="tag">${esc(x.status)}</span></td><td>${esc(x.note)}</td><td><div class="actions"><button onclick="editA(${x.id})">修改</button><button class="danger" onclick="delA(${x.id})">刪除</button></div></td></tr>`;
-}).join('')||'<tr><td colspan="5" class="empty">尚無出缺勤紀錄</td></tr>';
-$('total').textContent=as.length;
-$('present').textContent=as.filter(x=>x.status==='出席').length;
-$('late').textContent=as.filter(x=>x.status==='遲到').length;
-$('absent').textContent=as.filter(x=>['請假','缺席'].includes(x.status)).length;
-}
-function editA(id){
-let x=as.find(y=>y.id===id);formA();ea=id;
-$('aStudent').value=x.sid;$('aDate').value=x.date;$('aStatus').value=x.status;$('aNote').value=x.note;
-}
-function delA(id){
-if(confirm('確定刪除出缺勤紀錄？')){as=as.filter(x=>x.id!==id);store('attendance',as);renderA()}
-}
-function renderAll(){renderT();renderS();renderA()}
-$('filterDate').value=new Date().toLocaleDateString('en-CA');
-$('filterDate').addEventListener('change',renderA);
-renderAll();
-</script>
-</body>
+      function formT() {
+        et = null;
+        clear(["tName", "tPhone", "tSubject", "tDate"]);
+        $("tForm").classList.remove("hidden");
+      }
+      async function saveT() {
+        if (!checkAuth()) return;
+        if (!val("tName")) return alert("請輸入教師姓名");
+        let x = {
+          name: val("tName"),
+          phone: val("tPhone"),
+          subject: val("tSubject"),
+          date: $("tDate").value,
+        };
+        try {
+          if (et) {
+            await db.from("teachers").update(x).eq("id", et);
+          } else {
+            await db.from("teachers").insert([x]);
+          }
+          hide("tForm");
+          await loadT();
+        } catch (e) {
+          alert("錯誤：" + e.message);
+        }
+      }
+      async function loadT() {
+        try {
+          const { data } = await db.from("teachers").select();
+          ts = data || [];
+          renderT();
+        } catch (e) {
+          alert("載入教師資料失敗：" + e.message);
+        }
+      }
+      function renderT() {
+        let q = val("tSearch").toLowerCase();
+        $("tRows").innerHTML =
+          ts
+            .filter((x) => (x.name + x.subject).toLowerCase().includes(q))
+            .map(
+              (x) =>
+                `<tr><td>${esc(x.id.slice(0, 8))}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.subject)}</td><td>${esc(x.date)}</td><td><div class="actions"><button onclick="editT('${x.id}')">修改</button><button class="danger" onclick="delT('${x.id}')">刪除</button></div></td></tr>`,
+            )
+            .join("") ||
+          '<tr><td colspan="6" class="empty">尚無教師資料</td></tr>';
+      }
+      async function editT(id) {
+        let x = ts.find((y) => y.id === id);
+        et = id;
+        $("tName").value = x.name;
+        $("tPhone").value = x.phone;
+        $("tSubject").value = x.subject;
+        $("tDate").value = x.date;
+        $("tForm").classList.remove("hidden");
+      }
+      async function delT(id) {
+        if (!checkAuth()) return;
+        if (confirm("確定刪除教師資料？")) {
+          try {
+            await db.from("teachers").delete().eq("id", id);
+            await loadT();
+          } catch (e) {
+            alert("刪除失敗：" + e.message);
+          }
+        }
+      }
+
+      async function formTA() {
+        if (!ts.length) return alert("請先新增教師資料");
+        eta = null;
+        $("taTeacher").innerHTML = ts
+          .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
+          .join("");
+        $("taDate").value = new Date().toLocaleDateString("en-CA");
+        $("taStart").value = "";
+        $("taEnd").value = "";
+        $("taStatus").value = "正常";
+        $("taNote").value = "";
+        $("taForm").classList.remove("hidden");
+      }
+      async function saveTA() {
+        if (!checkAuth()) return;
+        let tid = $("taTeacher").value;
+        if (!tid) return alert("請選擇教師");
+        let x = {
+          teacher_id: tid,
+          date: $("taDate").value,
+          start_time: $("taStart").value,
+          end_time: $("taEnd").value,
+          status: $("taStatus").value,
+          note: val("taNote"),
+        };
+        try {
+          if (eta) {
+            await db.from("teacher_attendance").update(x).eq("id", eta);
+          } else {
+            await db.from("teacher_attendance").insert([x]);
+          }
+          hide("taForm");
+          await loadTA();
+        } catch (e) {
+          alert("錯誤：" + e.message);
+        }
+      }
+      async function loadTA() {
+        try {
+          const { data } = await db.from("teacher_attendance").select();
+          tas = data || [];
+          renderTA();
+        } catch (e) {
+          alert("載入教師到班資料失敗：" + e.message);
+        }
+      }
+      function renderTA() {
+        let d = $("taFilterDate").value;
+        let list = tas.filter((x) => !d || x.date === d);
+        $("taRows").innerHTML =
+          list
+            .map((x) => {
+              let t = ts.find((y) => y.id === x.teacher_id);
+              return `<tr><td>${esc(x.date)}</td><td>${esc(t ? t.name : "已刪除教師")}</td><td>${esc(x.start_time)}</td><td>${esc(x.end_time)}</td><td><span class="tag">${esc(x.status)}</span></td><td>${esc(x.note)}</td><td><div class="actions"><button onclick="editTA('${x.id}')">修改</button><button class="danger" onclick="delTA('${x.id}')">刪除</button></div></td></tr>`;
+            })
+            .join("") ||
+          '<tr><td colspan="7" class="empty">尚無教師到班紀錄</td></tr>';
+      }
+      async function editTA(id) {
+        let x = tas.find((y) => y.id === id);
+        await formTA();
+        eta = id;
+        $("taTeacher").value = x.teacher_id;
+        $("taDate").value = x.date;
+        $("taStart").value = x.start_time;
+        $("taEnd").value = x.end_time;
+        $("taStatus").value = x.status;
+        $("taNote").value = x.note;
+      }
+      async function delTA(id) {
+        if (!checkAuth()) return;
+        if (confirm("確定刪除教師到班紀錄？")) {
+          try {
+            await db.from("teacher_attendance").delete().eq("id", id);
+            await loadTA();
+          } catch (e) {
+            alert("刪除失敗：" + e.message);
+          }
+        }
+      }
+
+      function formS() {
+        es = null;
+        clear(["sName", "sGrade", "sParent", "sPhone", "sClass"]);
+        $("sForm").classList.remove("hidden");
+      }
+      async function saveS() {
+        if (!checkAuth()) return;
+        if (!val("sName")) return alert("請輸入學生姓名");
+        let x = {
+          name: val("sName"),
+          grade: val("sGrade"),
+          parent: val("sParent"),
+          phone: val("sPhone"),
+          class: val("sClass"),
+        };
+        try {
+          if (es) {
+            await db.from("students").update(x).eq("id", es);
+          } else {
+            await db.from("students").insert([x]);
+          }
+          hide("sForm");
+          await loadS();
+          await loadA();
+        } catch (e) {
+          alert("錯誤：" + e.message);
+        }
+      }
+      async function loadS() {
+        try {
+          const { data } = await db.from("students").select();
+          ss = data || [];
+          renderS();
+        } catch (e) {
+          alert("載入學生資料失敗：" + e.message);
+        }
+      }
+      function renderS() {
+        let q = val("sSearch").toLowerCase();
+        $("sRows").innerHTML =
+          ss
+            .filter((x) => (x.name + x.class + x.grade).toLowerCase().includes(q))
+            .map(
+              (x) =>
+                `<tr><td>${esc(x.id.slice(0, 8))}</td><td>${esc(x.name)}</td><td>${esc(x.grade)}</td><td>${esc(x.parent)}</td><td>${esc(x.phone)}</td><td>${esc(x.class)}</td><td><div class="actions"><button onclick="editS('${x.id}')">修改</button><button class="danger" onclick="delS('${x.id}')">刪除</button></div></td></tr>`,
+            )
+            .join("") ||
+          '<tr><td colspan="7" class="empty">尚無學生資料</td></tr>';
+      }
+      async function editS(id) {
+        let x = ss.find((y) => y.id === id);
+        es = id;
+        $("sName").value = x.name;
+        $("sGrade").value = x.grade;
+        $("sParent").value = x.parent;
+        $("sPhone").value = x.phone;
+        $("sClass").value = x.class;
+        $("sForm").classList.remove("hidden");
+      }
+      async function delS(id) {
+        if (!checkAuth()) return;
+        if (confirm("確定刪除學生資料？")) {
+          try {
+            await db.from("students").delete().eq("id", id);
+            await loadS();
+            await loadA();
+          } catch (e) {
+            alert("刪除失敗：" + e.message);
+          }
+        }
+      }
+
+      async function formA() {
+        if (!ss.length) return alert("請先新增學生資料");
+        ea = null;
+        $("aStudent").innerHTML = ss
+          .map((x) => `<option value="${x.id}">${esc(x.name)}</option>`)
+          .join("");
+        $("aDate").value = new Date().toLocaleDateString("en-CA");
+        $("aStatus").value = "出席";
+        $("aNote").value = "";
+        $("aForm").classList.remove("hidden");
+      }
+      async function saveA() {
+        if (!checkAuth()) return;
+        let sid = $("aStudent").value;
+        if (!sid) return alert("請選擇學生");
+        let x = {
+          student_id: sid,
+          date: $("aDate").value,
+          status: $("aStatus").value,
+          note: val("aNote"),
+        };
+        try {
+          if (ea) {
+            await db.from("attendance").update(x).eq("id", ea);
+          } else {
+            await db.from("attendance").insert([x]);
+          }
+          hide("aForm");
+          await loadA();
+        } catch (e) {
+          alert("錯誤：" + e.message);
+        }
+      }
+      async function loadA() {
+        try {
+          const { data } = await db.from("attendance").select();
+          as = data || [];
+          renderA();
+          renderStats();
+        } catch (e) {
+          alert("載入出缺勤資料失敗：" + e.message);
+        }
+      }
+      function renderA() {
+        let d = $("filterDate").value;
+        let list = as.filter((x) => !d || x.date === d);
+        $("aRows").innerHTML =
+          list
+            .map((x) => {
+              let s = ss.find((y) => y.id === x.student_id);
+              return `<tr><td>${esc(x.date)}</td><td>${esc(s ? s.name : "已刪除學生")}</td><td><span class="tag">${esc(x.status)}</span></td><td>${esc(x.note)}</td><td><div class="actions"><button onclick="editA('${x.id}')">修改</button><button class="danger" onclick="delA('${x.id}')">刪除</button></div></td></tr>`;
+            })
+            .join("") ||
+          '<tr><td colspan="5" class="empty">尚無出缺勤紀錄</td></tr>';
+        renderStats();
+      }
+      function renderStats() {
+        $("total").textContent = as.length;
+        $("present").textContent = as.filter((x) => x.status === "出席").length;
+        $("late").textContent = as.filter((x) => x.status === "遲到").length;
+        $("absent").textContent = as.filter((x) =>
+          ["請假", "缺席"].includes(x.status),
+        ).length;
+      }
+      async function editA(id) {
+        let x = as.find((y) => y.id === id);
+        await formA();
+        ea = id;
+        $("aStudent").value = x.student_id;
+        $("aDate").value = x.date;
+        $("aStatus").value = x.status;
+        $("aNote").value = x.note;
+      }
+      async function delA(id) {
+        if (!checkAuth()) return;
+        if (confirm("確定刪除出缺勤紀錄？")) {
+          try {
+            await db.from("attendance").delete().eq("id", id);
+            await loadA();
+          } catch (e) {
+            alert("刪除失敗：" + e.message);
+          }
+        }
+      }
+      async function renderAll() {
+        await loadT();
+        await loadTA();
+        await loadS();
+        await loadA();
+      }
+      function updateAuthUI() {
+        if (isLoggedIn) {
+          $("authStatus").textContent = `已登入：${currentUser.email}`;
+          $("authBtn").textContent = "登出";
+          document.querySelectorAll("nav").forEach(n => n.classList.remove("auth-locked"));
+          document.querySelectorAll("main").forEach(m => m.classList.remove("auth-locked"));
+        } else {
+          $("authStatus").textContent = "未登入";
+          $("authBtn").textContent = "登入";
+          document.querySelectorAll("nav").forEach(n => n.classList.add("auth-locked"));
+          document.querySelectorAll("main").forEach(m => m.classList.add("auth-locked"));
+        }
+      }
+      async function toggleAuth() {
+        if (isLoggedIn) {
+          await db.auth.signOut();
+          isLoggedIn = false;
+          currentUser = null;
+          updateAuthUI();
+          alert("已登出");
+        } else {
+          let email = prompt("請輸入管理員 Email：");
+          if (!email) return;
+          let password = prompt("請輸入密碼：");
+          if (!password) return;
+          try {
+            const { data, error } = await db.auth.signInWithPassword({ email, password });
+            if (error) {
+              alert("登入失敗：" + error.message);
+              return;
+            }
+            isLoggedIn = true;
+            currentUser = data.user;
+            updateAuthUI();
+            alert("登入成功");
+            await renderAll();
+          } catch (e) {
+            alert("登入錯誤：" + e.message);
+          }
+        }
+      }
+      function checkAuth() {
+        if (!isLoggedIn) {
+          alert("請先登入");
+          return false;
+        }
+        return true;
+      }
+      async function initAuth() {
+        const { data } = await db.auth.getSession();
+        if (data.session) {
+          isLoggedIn = true;
+          currentUser = data.session.user;
+        }
+        updateAuthUI();
+        await renderAll();
+      }
+      $("filterDate").value = new Date().toLocaleDateString("en-CA");
+      $("filterDate").addEventListener("change", renderA);
+      $("aFilterStatus").addEventListener("change", renderA);
+      $("aFilterStu").addEventListener("change", renderA);
+      $("taFilterDate").value = new Date().toLocaleDateString("en-CA");
+      $("taFilterDate").addEventListener("change", renderTA);
+      initAuth();
+    </script>
+  </body>
 </html>
